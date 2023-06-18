@@ -1,36 +1,24 @@
 ---
-
 author: Kshitij Gang
-
-pubDatetime: 2023-06-14T13:10:15Z
-
-title: Vacuuming in postgres database
-
+pubDatetime: 2023-06-18T13:10:15Z
+title: "Vacuuming in postgres database"
 postSlug: vacuuming-in-postgres
-
 featured: true
-
 draft: false
-
 tags:
-
-  - postgres
-
-  - database
-
-ogImage: “”
-
+  - postgres
+  - databases
+  - vacuuming
+ogImage: ""
 description:
-
-  What is vacuuming in Postgres SQL?
-
+  What is vacuuming in Postgres SQL?
 ---
 
  
 
 ### What is vacuuming?
 
-Every time we update a row in Postgres, it adds a new version of the row and marks the old version as invalid. Postgres doesn't physically remove a deleted row from the disk, instead, it marks it as invalid.. These rows continue to stay in the database until a vacuum is done. So vacuuming is just reclaiming this space occupied by dead rows and making it available for re-use.
+Every time we update a row in Postgres, it adds a new version of the row and marks the old version as invalid. Postgres doesn't physically remove a deleted row from the disk, instead, it marks it as invalid. These rows continue to stay in the database until a vacuum is done. So vacuuming is just reclaiming this space occupied by dead rows and making it available for re-use.
 
 ### Why does Postgres maintain versions of its rows rather than changing the actual value on disk?
 
@@ -40,7 +28,7 @@ This is primarily done to support [MVCC(multi-version concurrency control)](http
 
 We can witness that every time we update a row, a new one is created. We can get the “CTID” field of a row, which denotes the physical location of the data, and we can check if it changes for every update.
 
-```SQL
+``` sql
 
 CREATE TABLE NAMES(
 
@@ -50,11 +38,15 @@ first_name text,
 
 last_name text);
 
+-- creating an example table called names 
+
 insert into names(first_name,last_name) values (‘hello’,’world’);
 
 insert into names(first_name,last_name) values (‘hye’,’there’);
 
 insert into names(first_name,last_name) values (‘sup’,’’);
+
+-- inserting sample values to the names table
 
 select ctid,* from names
 
@@ -62,19 +54,19 @@ select ctid,* from names
 
 This will create a table with three rows and display the ctid and data of all the rows we have inserted in the table
 
-![output of the select query to show ctid](/public/assets/postgres-vacuum/names_rows_sql.png)
+![output of the select query to show ctid](/assets/vacuuming-in-postgres/names_rows_sql.png)
 
 This picture shows us the ctid of each row, the first number in ctid shows us the [page](https://learn.microsoft.com/en-us/sql/relational-databases/pages-and-extents-architecture-guide?view=sql-server-ver16) number and the second number represents the tuple number. This represents the location where the disk stores the row..
 
 If we update our row we will notice that the ctid of our row will change, which tells us that instead of updating the row on the disk where it is located, Postgres has created a new version of the row and has marked the other one as invalid.
 
-```SQL
+``` sql
 
 update names set first_name=’good’,last_name=’morning’ where id = 3;
 
 ```
 
-![output which show ctid of row with id=3 has changes](/public/assets/postgres-vacuum/update_names_rows_sql.png)
+![output which show ctid of row with id=3 has changes](/assets/vacuuming-in-postgres/update_names_rows_sql.png)
 
 If our table is not vacuumed, it will get bloated and slow down sequential table scans. It becomes extremely necessary to vacuum our database regularly to minimize disk space usage..
 
@@ -88,7 +80,7 @@ If you want Postgres to return disk space to the O.S. you should use vacuum full
 
 We are going to use our earlier names table. First, we will delete a row and add a new one, then we will check if it will reuse the ctid or not.
 
-```SQL
+``` sql
 
 delete from names where id = 2;
 
@@ -96,25 +88,25 @@ insert into names(first_name,last_name) values (‘good’,’afternoon’);
 
 ```
 
-![output after deleting then inserting without vacuuming](/public/assets/postgres-vacuum/insert_after_delete_no_vacuum.png)
+![output after deleting then inserting without vacuuming](/assets/vacuuming-in-postgres/insert_after_delete_no_vaccum.png)
 
 As we can see we get a new ctid for the newly inserted row.
 
 Now we will vacuum our table and again insert a new row into our table
 
-```SQL
+``` sql
 
 vacuum;
 
 ```
 
-```SQL
+``` sql
 
 insert into names(first_name,last_name) values (‘good’,’night’);
 
 ```
 
-![output for inserting a row after vacuuming the table](/public/assets/postgres-vacuum/insert_after_vacuum.png)
+![output for inserting a row after vacuuming the table](/assets/vacuuming-in-postgres/insert_after_vacuum.png)
 
 As we can see, Postgres has reused the same CTID (same disk location), and vacuuming was successful.
 
