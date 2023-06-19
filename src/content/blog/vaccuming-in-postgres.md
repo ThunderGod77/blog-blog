@@ -110,4 +110,7 @@ insert into names(first_name,last_name) values (‘good’,’night’);
 
 As we can see, Postgres has reused the same CTID (same disk location), and vacuuming was successful.
 
-Auto vacuum can use significant resources in your database, so you should try to schedule it during periods of low traffic. You should always fine-tune your auto vacuum settings.
+Best practices for vacuuming:
+
+ - Auto vacuum can use significant resources in your database, so you should try to schedule it during periods of low traffic.
+ - You should always fine-tune your auto vacuum settings.
