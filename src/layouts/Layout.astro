@@ -76,6 +76,10 @@ const socialImageURL = new URL(
     }
 
     <script is:inline src="/toggle-theme.js"></script>
+  </head>
+  <body>
+    <slot />
+    <!-- VISA Tracking Code for ganggang.dev -->
     <script type="text/partytown">
       window.dataLayer = window.dataLayer || [];
       (function (v, i, s, a, t) {
@@ -102,9 +106,5 @@ const socialImageURL = new URL(
         "va"
       );
     </script><!-- VISA Tracking Code for ganggang.dev -->
-  </head>
-  <body>
-    <slot />
-    <!-- VISA Tracking Code for ganggang.dev -->
   </body>
 </html>
