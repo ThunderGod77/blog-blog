@@ -10,11 +10,10 @@ tags:
   - databases
   - vacuuming
 ogImage: ""
-description:
-  What is vacuuming in Postgres SQL?
+description: What is vacuuming in Postgres SQL?
 ---
 
- 
+
 
 ### What is vacuuming?
 
@@ -22,13 +21,13 @@ Every time we update a row in Postgres, it adds a new version of the row and mar
 
 ### Why does Postgres maintain versions of its rows rather than changing the actual value on disk?
 
-This is primarily done to support [MVCC(multi-version concurrency control)](https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/What-is-MVCC-How-does-Multiversion-Concurrencty-Control-work#:~:text=Multiversion%20concurrency%20control%20(MVCC)%20is,don’t%20block%20each%20other.). MVCC primarily is an optimization technique to prevent excessive blocking when reading or writing a piece of data. It allows Postgres to implement different levels of isolations when running transactions that are concurrently working on the same data.
+This is primarily done to support [MVCC(multi-version concurrency control)](<https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/What-is-MVCC-How-does-Multiversion-Concurrencty-Control-work#:~:text=Multiversion%20concurrency%20control%20(MVCC)%20is,don’t%20block%20each%20other.>). MVCC primarily is an optimization technique to prevent excessive blocking when reading or writing a piece of data, i.e. multiple transactions can access the same data concurrently without locking each of them. It allows Postgres to implement different levels of isolations when running transactions that are concurrently working on the same data. This implies that during the process of querying a database, every transaction is presented with a snapshot of data (referred to as a database version) from a specific moment in the past, irrespective of the current state of the underlying data. This safeguard ensures that the transaction does not encounter inconsistent data resulting from concurrent updates made by other transactions to the same data rows. Thus, it guarantees transaction isolation for each individual database session.
 
 ## Witness Every Update Unfold as New Versions:
 
 We can witness that every time we update a row, a new one is created. We can get the “CTID” field of a row, which denotes the physical location of the data, and we can check if it changes for every update.
 
-``` sql
+```sql
 
 CREATE TABLE NAMES(
 
@@ -38,7 +37,7 @@ first_name text,
 
 last_name text);
 
--- creating an example table called names 
+-- creating an example table called names
 
 insert into names(first_name,last_name) values (‘hello’,’world’);
 
@@ -60,7 +59,7 @@ This picture shows us the ctid of each row, the first number in ctid shows us th
 
 If we update our row we will notice that the ctid of our row will change, which tells us that instead of updating the row on the disk where it is located, Postgres has created a new version of the row and has marked the other one as invalid.
 
-``` sql
+```sql
 
 update names set first_name=’good’,last_name=’morning’ where id = 3;
 
@@ -80,7 +79,7 @@ If you want Postgres to return disk space to the O.S. you should use vacuum full
 
 We are going to use our earlier names table. First, we will delete a row and add a new one, then we will check if it will reuse the ctid or not.
 
-``` sql
+```sql
 
 delete from names where id = 2;
 
@@ -94,13 +93,13 @@ As we can see we get a new ctid for the newly inserted row.
 
 Now we will vacuum our table and again insert a new row into our table
 
-``` sql
+```sql
 
 vacuum;
 
 ```
 
-``` sql
+```sql
 
 insert into names(first_name,last_name) values (‘good’,’night’);
 
@@ -112,5 +111,5 @@ As we can see, Postgres has reused the same CTID (same disk location), and vacuu
 
 Best practices for vacuuming:
 
- - Auto vacuum can use significant resources in your database, so you should try to schedule it during periods of low traffic.
- - You should always fine-tune your auto vacuum settings.
+- Auto vacuum can use significant resources in your database, so you should try to schedule it during periods of low traffic.
+- You should always fine-tune your auto vacuum settings.
