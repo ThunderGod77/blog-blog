@@ -3,7 +3,7 @@ author: Kshitij Gang
 pubDatetime: 2023-06-18T13:10:15Z
 title: "Vacuuming in postgres database"
 postSlug: vacuuming-in-postgres
-featured: true
+featured: false
 draft: false
 tags:
   - postgres
