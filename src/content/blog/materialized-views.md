@@ -18,7 +18,7 @@ Materialized views allow us to store the result of a very complicated long-runni
 
 ## When will a materialized view be beneficial to us?
 
-For example, we have an e-commerce application where we are selling different kinds of jams in certain regions of India, and our business team might be interested in how many jars of jam are we selling in each city. If we have more than a million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be to store our results in a materialized view.
+For example, we have an e-commerce application where we are selling different kinds of jams in certain regions of India, and our business team might be interested in how many jars of jam are we selling in each region. If we have more than a million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be to store our results in a materialized view.
 
 Example Tables in our database:
 
@@ -107,14 +107,13 @@ If for some reason we will delete all the orders from the 'east' region(due to s
 delete from orders where region='east'
 ```
 
+![materialized view result after refresh](/assets/materialized-views/refresh-materialized-view-result.png)
 If we query the materialized view we will realize the data is not updated, and we can still see the data of 'east' region. We will now have to refresh the materialized view to see the latest data.
 
 ```sql
 REFRESH MATERIALIZED VIEW jam_order_agg;
 select * from jam_order_agg where region='east';
 ```
-
-![materialized view result after refresh](/assets/materialized-views/refresh-materialized-view-result.png)
 
 Please note that REFRESH MATERIALIZED VIEW command does block the view in AccessExclusive mode, so while it is working, you can't even do SELECT on the table. Although, if you are in version 9.4 or newer, you can give it the CONCURRENTLY option - this will acquire an ExclusiveLock, and will not block SELECT queries, but may have a bigger overhead.
 
