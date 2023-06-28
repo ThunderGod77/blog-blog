@@ -1,7 +1,7 @@
 ---
 author: Kshitij Gang
 pubDatetime: 2023-06-23T13:10:15Z
-title: "Materialized views in Postgres SQL"
+title: "Materialized Views in Postgres SQL"
 postSlug: materialized-view-postgres
 featured: false
 draft: false
@@ -12,15 +12,13 @@ ogImage: ""
 description: How to optimize your queries using Materialized Views?
 ---
 
-
-
 ### What is a materialized view?
 
 Materialized views allow us to store the result of a very complicated long-running query on the disk. We can now use the saved query as any other table in the database and query results from it. Materialize view is a cached result of a query, so it will not update its values even if the underlying tables it's derived from are updated/changed. To get the new values we will have to refresh our materialized view.
 
 ## When will a materialized view be beneficial to us?
 
-For example, we have an e-commerce application where we are selling different kinds of jams in certain cities in India , and our business team might be interested in how many jars of jam are we selling in each city. If we have more than million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be store our results in a materialized views.
+For example, we have an e-commerce application where we are selling different kinds of jams in certain regions of India, and our business team might be interested in how many jars of jam are we selling in each city. If we have more than a million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be to store our results in a materialized view.
 
 Example Tables in our database:
 
@@ -33,7 +31,7 @@ CREATE TABLE jams (
   description text,
   metadata text
 )
--- inserting 10 sample jams into our jams table
+-- Inserting 10 sample jams into our jams table
 
 INSERT INTO jams (name, price, description, metadata)
   VALUES ('Strawberry Jam', 5, 'Delicious strawberry jam made from fresh berries', 'Organic, no preservatives'),
@@ -47,8 +45,11 @@ INSERT INTO jams (name, price, description, metadata)
   ('Pineapple Jam', 5, 'Tropical pineapple jam bursting with flavor', 'Perfect for spreading on toast'),
   ('Cherry Jam', 4, 'Sweet cherry jam made from plump cherries', 'Locally sourced and freshly made');
 
+```
 
+```sql
 --creating our orders table
+
 CREATE TABLE orders (
   id serial PRIMARY KEY,
   jam_id int,
@@ -57,12 +58,11 @@ CREATE TABLE orders (
   user_id int,
   shipper text,
   CONSTRAINT fk_jam
-      FOREIGN KEY(jam_id) 
-	  REFERENCES jams(id)
+      FOREIGN KEY(jam_id)
+    REFERENCES jams(id)
 )
 
 ```
-
 
 We will now insert approximately 5 million rows into our orders table.[(You can find the golang code to do so here)]()
 
@@ -76,10 +76,10 @@ ON orders.jam_id = jams.id
 GROUP by jams.name, orders.region;
 ```
 
-![Result of the query](/assets/materialized0-views/mv-blog-agg-query.png)
-![Time take by the query](/assets/materialized0-views/mv-blog-agg-query.png)
+![Result of the query](/assets/materialized-views/mv-blog-agg-query.png)
+![Time take by the query](/assets/materialized-views/time-take-agg-q.png)
 
-This query took almost 90 seconds to run, so everytime we will have to generate reports using this query it will take a huge amount of time, so it makes much more sense to use a materialized view which will cache the result and we can further query within the result. It will save us a lot of time and if we want to update the result, we can easily do so by refreshing the materialized views.
+This query took almost 90 seconds to run, so every time we will have to generate reports using this query it will take a huge amount of time, so it makes much more sense to use a materialized view. This will cache the result on the disk and we can further query within the resulting table generated from the query. It will save us a lot of time and if we want to update the result, we can easily do so by refreshing the materialized views.
 
 So we will create a materialized view now
 
@@ -93,13 +93,13 @@ ON orders.jam_id = jams.id
 GROUP by jams.name, orders.region;
 ```
 
-If we query the materialized view instead of executing the original query now, it will take only 200 ms.
+If we query the materialized view instead of executing the original query now, it will take less than an ms.
 
-![Time take when querying the materialized view](/assets/materialized0-views/mv-query-time.png)
+![Time take when querying the materialized view](/assets/materialized-views/mv-query-time.png)
 
 We can also filter data when querying. from a materialized view
 
-![materialized view filter](/assets/materialized0-views/querying-the-mv-filter.png)
+![materialized view filter](/assets/materialized-views/querying-the-mv-filter.png)
 
 If for some reason we will delete all the orders from the 'east' region(due to some logistical issues in our jam company).
 
@@ -114,13 +114,13 @@ REFRESH MATERIALIZED VIEW jam_order_agg;
 select * from jam_order_agg where region='east';
 ```
 
-![materialized view result after refresh](/assets/materialized0-views/refresh-materialized-view-result.png)
+![materialized view result after refresh](/assets/materialized-views/refresh-materialized-view-result.png)
 
 Please note that REFRESH MATERIALIZED VIEW command does block the view in AccessExclusive mode, so while it is working, you can't even do SELECT on the table. Although, if you are in version 9.4 or newer, you can give it the CONCURRENTLY option - this will acquire an ExclusiveLock, and will not block SELECT queries, but may have a bigger overhead.
 
-## Differenced between view and materialized view in postgres?
+## Differenced between view and materialized view in Postgres?
 
-View is a virtual table from one or more base table, they are actually just represent a select query (does not store the result of the select query). It acts as a placeholder for a particular select query, they are processed each time when they are used and always contain the updated data.
+View is a virtual table from one or more base tables, they actually just represent a select query (does not store the result of the select query). It acts as a placeholder for a particular select query, they are processed each time when they are used and always contain the updated data.
 
 ```sql
 CREATE VIEW av
@@ -133,12 +133,12 @@ GROUP by jams.name, orders.region;
 
 ```
 
-![view query twice](/assets/materialized0-views/view-query-2.png)
+![view query twice](/assets/materialized-views/view-query-2.png)
 
-As we can see this query took 90 seconds double the time to run the select query, which tells us that views do no cache the result.
+As we can see this query took 90 seconds double the time to run the select query, which tells us that views do not cache the result.
 
+While materialized views on the other hand store the select query and cache it's result in the disk. So they are computed only at the time of creation or while refreshing, They are much faster to access but might not contain the latest data.
 
+## Conclusion
 
-While materialized views on the other hand actually store the select query and cache it's result in the disk. So they are compute only at the time of creation or while refreshing, They are much faster to access but might not contain the latest data.
-
-
+So we learned how materialized views can be used in our applications and can save us significant time when querying aggregated/transformed data. Please note you can use 'select' statements and create indexes on a materialized view but cannot use the 'insert' command on it. Sometimes you need to move, replace, or add particular elements within a materialized view, to complete this task, the ALTER MATERIALIZED VIEW command can be used you can delete the materialized view using DROP MATERIALIZED VIEW command.
