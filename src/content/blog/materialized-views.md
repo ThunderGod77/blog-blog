@@ -18,7 +18,7 @@ Materialized views allow us to store the result of a very complicated long-runni
 
 ## When will a materialized view be beneficial to us?
 
-For example, we have an e-commerce application where we are selling different kinds of jams in certain regions of India, and our business team might be interested in how many jars of jam are we selling in each city. If we have more than a million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be to store our results in a materialized view.
+For example, we have an e-commerce application where we are selling different kinds of jams in certain regions of India, and our business team might be interested in how many jars of jam are we selling in each region. If we have more than a million orders per day, it might become a complicated query and will take a significant time every time we execute it. So the better approach will be to store our results in a materialized view.
 
 Example Tables in our database:
 
