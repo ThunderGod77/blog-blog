@@ -135,7 +135,7 @@ GROUP by jams.name, orders.region;
 
 ![view query twice](/assets/materialized-views/view-query-2.png)
 
-As we can see this query took 90 seconds double the time to run the select query, which tells us that views do not cache the result.
+As we can see this query took 90 seconds(as I have deleted certain rows while experimenting it takes much lesser time than the original query) to run the select query, which tells us that views do not cache the result.
 
 While materialized views on the other hand store the select query and cache it's result in the disk. So they are computed only at the time of creation or while refreshing, They are much faster to access but might not contain the latest data.
 
