@@ -1,6 +1,6 @@
 ---
 author: Kshitij Gang
-pubDatetime: 2023-06-23T13:10:15Z
+pubDatetime: 2023-06-28T13:10:15Z
 title: "Materialized Views in Postgres SQL"
 postSlug: materialized-view-postgres
 featured: false
@@ -64,7 +64,7 @@ CREATE TABLE orders (
 
 ```
 
-We will now insert approximately 5 million rows into our orders table.[(You can find the golang code to do so here)]()
+We will now insert approximately 5 million rows into our orders table.[(You can find the golang code to do so here)](https://github.com/ThunderGod77/blog-code/tree/main/mt-view)
 
 We will now write a SQL query to join the jams and orders table and find the aggregate sales for every jam in each region
 
