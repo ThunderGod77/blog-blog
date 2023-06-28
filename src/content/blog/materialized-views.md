@@ -107,13 +107,14 @@ If for some reason we will delete all the orders from the 'east' region(due to s
 delete from orders where region='east'
 ```
 
-![materialized view result after refresh](/assets/materialized-views/refresh-materialized-view-result.png)
 If we query the materialized view we will realize the data is not updated, and we can still see the data of 'east' region. We will now have to refresh the materialized view to see the latest data.
 
 ```sql
 REFRESH MATERIALIZED VIEW jam_order_agg;
 select * from jam_order_agg where region='east';
 ```
+
+![materialized view result after refresh](/assets/materialized-views/refresh-materialized-view-result.png)
 
 Please note that REFRESH MATERIALIZED VIEW command does block the view in AccessExclusive mode, so while it is working, you can't even do SELECT on the table. Although, if you are in version 9.4 or newer, you can give it the CONCURRENTLY option - this will acquire an ExclusiveLock, and will not block SELECT queries, but may have a bigger overhead.
 
