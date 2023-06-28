@@ -1,6 +1,8 @@
 # Ignore everything
 /*
 
+*.txt
+
 # Except these files & folders
 !/src
 !/public

@@ -3,3 +3,8 @@ Disallow: /nogooglebot/
 
 User-agent: *
 Allow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://ganggang.dev/sitemap-index.xml
