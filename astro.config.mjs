@@ -17,12 +17,12 @@ export default defineConfig({
       },
     }),
     react(),
-    sitemap(),
-    partytown({
-      // Adds dataLayer.push as a forwarding-event.
-      config: {
-        forward: ["dataLayer.push"],
-      },
+    sitemap({
+      customPages: [
+        "https://ganggang.dev/posts/recommended-good-reads/",
+        "https://ganggang.dev/posts/materialized-view-postgres/",
+        "https://ganggang.dev/posts/vacuuming-in-postgres/",
+      ],
     }),
   ],
   markdown: {
