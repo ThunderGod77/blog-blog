@@ -1,6 +1,6 @@
 ---
 author: Kshitij Gang
-pubDatetime: 2023-06-28T13:10:15Z
+pubDatetime: 2023-06-29T10:10:15Z
 title: "Materialized Views in Postgres SQL"
 postSlug: materialized-view-postgres
 featured: false
